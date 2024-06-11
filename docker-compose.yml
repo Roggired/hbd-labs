@@ -23,12 +23,22 @@ services:
     networks:
       hbd:
         ipv4_address: 172.16.0.3
-  airflow:
+  airflow-init:
     image: apache/airflow:latest
-    environment:
-
+    entrypoint: "airflow db migrate"
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./airflow/data/:/opt/airflow/data
+    networks:
+      hbd:
+        ipv4_address: 172.16.0.5
+  airflow:
+    depends_on:
+      - airflow-init
+    image: apache/airflow:latest
+    entrypoint: "airflow standalone"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/ddl:/opt/airflow/ddl
     networks:
       hbd:
         ipv4_address: 172.16.0.4
