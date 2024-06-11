@@ -7,7 +7,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongo
       MONGO_INITDB_ROOT_PASSWORD: mongo
     volumes:
-      - ./lab2/mongo_init:/docker-entrypoint-initdb.d/
+      - ./mongo_init:/docker-entrypoint-initdb.d/
     networks:
       hbd:
         ipv4_address: 172.16.0.2
@@ -18,7 +18,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - ./lab1/postgres_init:/docker-entrypoint-initdb.d/
+      - ./postgres_init:/docker-entrypoint-initdb.d/
     networks:
       hbd:
         ipv4_address: 172.16.0.3
