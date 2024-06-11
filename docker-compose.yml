@@ -19,6 +19,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - ./postgres_init:/docker-entrypoint-initdb.d/
+      - ./scripts:/scripts
     networks:
       hbd:
         ipv4_address: 172.16.0.3
