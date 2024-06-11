@@ -23,6 +23,15 @@ services:
     networks:
       hbd:
         ipv4_address: 172.16.0.3
+  airflow:
+    image: apache/airflow:latest
+    environment:
+
+    volumes:
+      - ./dags:/opt/airflow/dags
+    networks:
+      hbd:
+        ipv4_address: 172.16.0.4
 networks:
   hbd:
     driver: bridge
