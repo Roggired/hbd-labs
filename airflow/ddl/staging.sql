@@ -50,36 +50,27 @@ CREATE TABLE staging.mongo_clients
 (
     id      VARCHAR(31) PRIMARY KEY,
     obj_val JSONB NOT NULL,
+    when_created  TIMESTAMP,
+    when_updated  TIMESTAMP,
+    when_uploaded TIMESTAMP
 );
 
 CREATE TABLE staging.mongo_orders
 (
     id      VARCHAR(31) PRIMARY KEY,
     obj_val JSONB NOT NULL,
-);
-
-CREATE TABLE staging.mongo_ordered_dish
-(
-    id      VARCHAR(31) PRIMARY KEY,
-    obj_val JSONB NOT NULL,
-);
-
-CREATE TABLE staging.mongo_order_statuses
-(
-    id      VARCHAR(31) PRIMARY KEY,
-    obj_val JSONB NOT NULL,
+    when_created  TIMESTAMP,
+    when_updated  TIMESTAMP,
+    when_uploaded TIMESTAMP
 );
 
 CREATE TABLE staging.mongo_restaurant
 (
     id      VARCHAR(31) PRIMARY KEY,
     obj_val JSONB NOT NULL,
-);
-
-CREATE TABLE staging.mongo_restaurant_menu
-(
-    id      VARCHAR(31) PRIMARY KEY,
-    obj_val JSONB NOT NULL,
+    when_created  TIMESTAMP,
+    when_updated  TIMESTAMP,
+    when_uploaded TIMESTAMP
 );
 
 CREATE TABLE staging.api_deliveryman
