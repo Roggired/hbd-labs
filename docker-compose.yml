@@ -27,7 +27,7 @@ services:
     image: apache/airflow:latest
     entrypoint: "airflow db migrate"
     volumes:
-      - ./airflow/data/:/opt/airflow/data
+      - ./etl/data/:/opt/airflow/data
     networks:
       hbd:
         ipv4_address: 172.16.0.5
@@ -37,8 +37,8 @@ services:
     image: apache/airflow:latest
     entrypoint: "airflow standalone"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/ddl:/opt/airflow/ddl
+      - ./etl/dags:/opt/airflow/dags
+      - ./etl/ddl:/opt/airflow/ddl
     networks:
       hbd:
         ipv4_address: 172.16.0.4
