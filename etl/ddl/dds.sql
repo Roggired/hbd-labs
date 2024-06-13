@@ -19,7 +19,7 @@ CREATE TABLE dds.dm_orders
     id            BIGINT PRIMARY KEY,
     client_id     BIGINT REFERENCES dm_deliveryman (deliveryman_id) ON DELETE CASCADE NOT NULL,
     restaurant_id BIGINT REFERENCES dm_payments (payment_id) ON DELETE CASCADE        NOT NULL,
-    category_id   BIGINT REFERENCES dm_deliveries (id) ON DELETE CASCADE              NOT NULL
+    delivery_id   BIGINT REFERENCES dm_deliveries (id) ON DELETE CASCADE              NOT NULL
 );
 
 CREATE TABLE dds.dm_deliveries
