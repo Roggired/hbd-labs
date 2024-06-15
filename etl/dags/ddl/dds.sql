@@ -1,28 +1,19 @@
-CREATE SCHEMA dds AUTHORIZATION CURRENT_USER;
+CREATE SCHEMA IF NOT EXISTS dds AUTHORIZATION CURRENT_USER;
 
-CREATE TABLE dds.dm_deliveryman
+CREATE TABLE IF NOT EXISTS dds.dm_deliveryman
 (
     deliveryman_id BIGINT PRIMARY KEY,
     name           VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE dds.dm_payments
+CREATE TABLE IF NOT EXISTS dds.dm_payments
 (
     payment_id    BIGINT PRIMARY KEY,
     payment_year  INT NOT NULL,
     payment_month INT NOT NULL
 );
 
--- Снежинка
-CREATE TABLE dds.dm_orders
-(
-    id            BIGINT PRIMARY KEY,
-    client_id     BIGINT REFERENCES dm_deliveryman (deliveryman_id) ON DELETE CASCADE NOT NULL,
-    restaurant_id BIGINT REFERENCES dm_payments (payment_id) ON DELETE CASCADE        NOT NULL,
-    delivery_id   BIGINT REFERENCES dm_deliveries (id) ON DELETE CASCADE              NOT NULL
-);
-
-CREATE TABLE dds.dm_deliveries
+CREATE TABLE IF NOT EXISTS dds.dm_deliveries
 (
     id                BIGINT PRIMARY KEY,
     orders_amount     INT              NOT NULL,
@@ -31,7 +22,16 @@ CREATE TABLE dds.dm_deliveries
     tips              SMALLINT         NOT NULL
 );
 
--- CREATE TABLE staging.mongo_clients
+-- Снежинка
+CREATE TABLE IF NOT EXISTS dds.dm_orders
+(
+    id            BIGINT PRIMARY KEY,
+    client_id     BIGINT REFERENCES dds.dm_deliveryman (deliveryman_id) ON DELETE CASCADE NOT NULL,
+    restaurant_id BIGINT REFERENCES dds.dm_payments (payment_id) ON DELETE CASCADE        NOT NULL,
+    delivery_id   BIGINT REFERENCES dds.dm_deliveries (id) ON DELETE CASCADE              NOT NULL
+);
+
+-- CREATE TABLE IF NOT EXISTS staging.mongo_clients
 -- (
 --     id            VARCHAR(31) PRIMARY KEY,
 --     name          VARCHAR(255),
@@ -46,7 +46,7 @@ CREATE TABLE dds.dm_deliveries
 --     when_uploaded TIMESTAMP
 -- );
 --
--- CREATE TABLE staging.mongo_orders
+-- CREATE TABLE IF NOT EXISTS staging.mongo_orders
 -- (
 --     id               VARCHAR(31) PRIMARY KEY,
 --     restaurant       VARCHAR(31),
@@ -63,7 +63,7 @@ CREATE TABLE dds.dm_deliveries
 --     when_uploaded    TIMESTAMP
 -- );
 --
--- CREATE TABLE staging.mongo_ordered_dish
+-- CREATE TABLE IF NOT EXISTS staging.mongo_ordered_dish
 -- (
 --     id             VARCHAR(31) PRIMARY KEY,
 --     name           VARCHAR(255),
@@ -72,7 +72,7 @@ CREATE TABLE dds.dm_deliveries
 --     mongo_order_id VARCHAR(31) REFERENCES staging.mongo_orders (id) ON DELETE CASCADE NOT NULL
 -- );
 --
--- CREATE TABLE staging.mongo_order_statuses
+-- CREATE TABLE IF NOT EXISTS staging.mongo_order_statuses
 -- (
 --     id             VARCHAR(31) PRIMARY KEY,
 --     status         VARCHAR(31),
@@ -80,7 +80,7 @@ CREATE TABLE dds.dm_deliveries
 --     mongo_order_id VARCHAR(31) REFERENCES staging.mongo_orders (id) ON DELETE CASCADE NOT NULL
 -- );
 --
--- CREATE TABLE staging.mongo_restaurant
+-- CREATE TABLE IF NOT EXISTS staging.mongo_restaurant
 -- (
 --     id            VARCHAR(31) PRIMARY KEY,
 --     name          VARCHAR(255),
@@ -93,7 +93,7 @@ CREATE TABLE dds.dm_deliveries
 --     when_uploaded TIMESTAMP
 -- );
 --
--- CREATE TABLE staging.mongo_restaurant_menu
+-- CREATE TABLE IF NOT EXISTS staging.mongo_restaurant_menu
 -- (
 --     id                  VARCHAR(31) PRIMARY KEY,
 --     name                VARCHAR(255),

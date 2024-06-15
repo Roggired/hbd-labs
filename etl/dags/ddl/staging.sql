@@ -1,6 +1,6 @@
-CREATE SCHEMA staging AUTHORIZATION CURRENT_USER;
+CREATE SCHEMA IF NOT EXISTS staging AUTHORIZATION CURRENT_USER;
 
-CREATE TABLE staging.pg_dish
+CREATE TABLE IF NOT EXISTS staging.pg_dish
 (
     dish_id       BIGINT PRIMARY KEY,
     name          VARCHAR(255),
@@ -10,7 +10,7 @@ CREATE TABLE staging.pg_dish
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.pg_category
+CREATE TABLE IF NOT EXISTS staging.pg_category
 (
     category_id   BIGINT PRIMARY KEY,
     name          VARCHAR(255),
@@ -21,7 +21,7 @@ CREATE TABLE staging.pg_category
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.pg_client
+CREATE TABLE IF NOT EXISTS staging.pg_client
 (
     client_id     BIGINT PRIMARY KEY,
     bonus_balance BIGINT,
@@ -31,7 +31,7 @@ CREATE TABLE staging.pg_client
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.pg_payment
+CREATE TABLE IF NOT EXISTS staging.pg_payment
 (
     payment_id    BIGINT PRIMARY KEY,
     client_id     BIGINT,
@@ -46,7 +46,7 @@ CREATE TABLE staging.pg_payment
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.mongo_clients
+CREATE TABLE IF NOT EXISTS staging.mongo_clients
 (
     id            BIGSERIAL PRIMARY KEY,
     obj_id        VARCHAR(31) NOT NULL UNIQUE,
@@ -56,7 +56,7 @@ CREATE TABLE staging.mongo_clients
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.mongo_orders
+CREATE TABLE IF NOT EXISTS staging.mongo_orders
 (
     id            BIGSERIAL PRIMARY KEY,
     obj_id        VARCHAR(31) NOT NULL UNIQUE,
@@ -65,7 +65,7 @@ CREATE TABLE staging.mongo_orders
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.mongo_restaurant
+CREATE TABLE IF NOT EXISTS staging.mongo_restaurant
 (
     id            BIGSERIAL PRIMARY KEY,
     obj_id        VARCHAR(31) NOT NULL UNIQUE,
@@ -74,7 +74,7 @@ CREATE TABLE staging.mongo_restaurant
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.api_deliveryman
+CREATE TABLE IF NOT EXISTS staging.api_deliveryman
 (
     id            VARCHAR(31) PRIMARY KEY,
     name          VARCHAR(255),
@@ -83,7 +83,7 @@ CREATE TABLE staging.api_deliveryman
     when_uploaded TIMESTAMP
 );
 
-CREATE TABLE staging.api_delivery
+CREATE TABLE IF NOT EXISTS staging.api_delivery
 (
     delivery_id        VARCHAR(31) PRIMARY KEY,
     deliveryman_id     VARCHAR(31),

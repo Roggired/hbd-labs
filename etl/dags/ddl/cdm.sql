@@ -1,6 +1,6 @@
-CREATE SCHEMA cdm AUTHORIZATION CURRENT_USER;
+CREATE SCHEMA IF NOT EXISTS cdm AUTHORIZATION CURRENT_USER;
 
-CREATE TABLE cdm.deliveryman_income
+CREATE TABLE IF NOT EXISTS cdm.deliveryman_income
 (
     id                       BIGSERIAL PRIMARY KEY,
     deliveryman_id           BIGINT           NOT NULL,

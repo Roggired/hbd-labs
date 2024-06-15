@@ -34,6 +34,10 @@ CREATE TABLE payment
 
 CREATE TYPE log_action AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 
+-- TODO: нужно добавить в табличку лога идентификатор строки, для которой лог-запись создана.
+-- это позволит на стороне дага загрузки данных в airflow намутить инкрементальную загрузку +
+-- позволит определить записи when_created и when_updated. Что не мало важно, мы также сможем
+-- удалять записи из staging слоя, которые были удалены в бд-источнике.
 CREATE TABLE logs
 (
 	id BIGSERIAL PRIMARY KEY,
