@@ -1,4 +1,3 @@
-version: '3'
 services:
   mongodb:
     image: mongo:latest
@@ -23,22 +22,23 @@ services:
     networks:
       hbd:
         ipv4_address: 172.16.0.3
-  airflow-init:
-    image: apache/airflow:latest
-    entrypoint: "airflow db migrate"
-    volumes:
-      - ./etl/data/:/opt/airflow/data
-    networks:
-      hbd:
-        ipv4_address: 172.16.0.5
+#  airflow-init:
+#    image: apache/airflow:latest
+#    entrypoint: "airflow db migrate"
+#    volumes:
+#      - ./etl/data/airflow.db:/opt/airflow/airflow.db
+#    networks:
+#      hbd:
+#        ipv4_address: 172.16.0.5
   airflow:
-    depends_on:
-      - airflow-init
+#    depends_on:
+#      - airflow-init
     image: apache/airflow:latest
     entrypoint: "airflow standalone"
     volumes:
       - ./etl/dags:/opt/airflow/dags
       - ./etl/ddl:/opt/airflow/ddl
+      - ./etl/data/airflow.db:/opt/airflow/airflow.db
     networks:
       hbd:
         ipv4_address: 172.16.0.4

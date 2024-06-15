@@ -1,0 +1,10 @@
+services:
+  mongodb:
+    ports:
+      - "27017:27017"
+  postgres:
+    ports:
+      - "5432:5432"
+  airflow:
+    ports:
+      - "8080:8080"
