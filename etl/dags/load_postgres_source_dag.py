@@ -1,164 +1,93 @@
 import datetime
-from typing import Any, List
+from typing import Any, List, Dict
 
 from airflow.decorators import dag
+from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from airflow.models.taskinstance import TaskInstance
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 
-# TODO: incremental data loading
 @dag(
     dag_id="load_postgres_source",
-    schedule_interval='@once',
-    start_date=datetime.datetime.now(),
+    schedule_interval='*/1 * * * *',
+    start_date=datetime.datetime(2024, 6, 16),
     catchup=False,
     tags=['load'],
     is_paused_upon_creation=False,
 )
 def load_postgres_source_dag():
-    # --------------------------------------- dish ---------------------------------------
-    load_dish_from_source = SQLExecuteQueryOperator(
-        task_id='load_dish_from_source',
-        conn_id='postgres_source',
-        sql='SELECT * FROM dish;'
-    )
-
-    def process_dish(task_instance: TaskInstance):
-        values: List[Any] = task_instance.xcom_pull(task_ids='load_dish_from_source')
-        values_prepared: List[str] = []
-
-        for value in values:
-            values_prepared.append(f"""
-                (
-                    {value[0]},
-                    '{value[1]}',
-                    {value[2]},
-                    null,
-                    null,
-                    now()
-                )
-            """)
-
-        return ",".join(values_prepared)
-    process_dish_op = PythonOperator(task_id='process_dish', python_callable=process_dish)
-
-    save_dish_to_staging = SQLExecuteQueryOperator(
-        task_id='save_dish_to_staging',
+    # --------------------------------------- settings -----------------------------------
+    load_settings = SQLExecuteQueryOperator(
+        task_id='load_settings',
         conn_id='postgres_dwh',
-        sql="INSERT INTO staging.pg_dish(dish_id, name, price, when_created, when_updated, when_uploaded) VALUES {{ ti.xcom_pull(task_ids='process_dish') }}"
+        sql="SELECT settings FROM staging.settings WHERE source_id = 'POSTGRES';"
     )
+
+    def process_settings(task_instance: TaskInstance):
+        values: List[List[Any]] = task_instance.xcom_pull(task_ids='load_settings')
+        settings: Dict[str, Any]
+        if len(values) <= 0:
+            settings = {
+                'last_loaded_log_id': 0
+            }
+        else:
+            settings = values[0][0]
+
+        Variable.set(
+            key='POSTGRES__last_loaded_log_id',
+            value=settings['last_loaded_log_id'],
+        )
+        return settings['last_loaded_log_id']
+    process_settings_op = PythonOperator(task_id='process_settings', python_callable=process_settings)
     # ------------------------------------------------------------------------------------
-    
-    # --------------------------------------- category -----------------------------------
-    load_category_from_source = SQLExecuteQueryOperator(
-        task_id='load_category_from_source',
+
+    # --------------------------------------- logs ---------------------------------------
+    load_logs = SQLExecuteQueryOperator(
+        task_id='load_logs',
         conn_id='postgres_source',
-        sql='SELECT * FROM category;'
+        sql="SELECT * FROM logs WHERE id > {{ ti.xcom_pull(task_ids='process_settings') }};"
     )
 
-    def process_category(task_instance: TaskInstance):
-        values: List[Any] = task_instance.xcom_pull(task_ids='load_category_from_source')
-        values_prepared: List[str] = []
+    def process_logs(task_instance: TaskInstance):
+        values: List[Any] = task_instance.xcom_pull(task_ids='load_logs')
+        operations: List[str]
+        last_loaded_log_id = int(Variable.get(key='POSTGRES__last_loaded_log_id'))
 
-        for value in values:
-            values_prepared.append(f"""
-                (
-                    {value[0]},
-                    '{value[1]}',
-                    {value[2]},
-                    {value[3]},
-                    null,
-                    null,
-                    now()
-                )
-            """)
+        from processors.postgres_processor import PostgresProcessor
+        import json
+        postgres_processor = PostgresProcessor(last_loaded_log_id)
 
-        return ",".join(values_prepared)
-    process_category_op = PythonOperator(task_id='process_category', python_callable=process_category)
+        operations = list(
+            map(
+                lambda row: postgres_processor.process_log_row_into_operation(row),
+                values,
+            )
+        )
 
-    save_category_to_staging = SQLExecuteQueryOperator(
-        task_id='save_category_to_staging',
+        updated_settings: Dict[str, Any] = {
+            'last_loaded_log_id': postgres_processor.get_last_processed_log_id()
+        }
+        if last_loaded_log_id == 0:
+            operations.append(
+                f"INSERT INTO staging.settings(source_id, settings) VALUES('POSTGRES', '{json.dumps(updated_settings)}')"
+            )
+        else:
+            operations.append(
+                f"UPDATE staging.settings SET settings = '{json.dumps(updated_settings)}' WHERE source_id = 'POSTGRES'"
+            )
+
+        return ';'.join(operations)
+    process_logs_op = PythonOperator(task_id='process_logs', python_callable=process_logs)
+
+    save_changes_to_staging = SQLExecuteQueryOperator(
+        task_id='save_changes_to_staging',
         conn_id='postgres_dwh',
-        sql="INSERT INTO staging.pg_category(category_id, name, percent, min_payment, when_created, when_updated, when_uploaded) VALUES {{ ti.xcom_pull(task_ids='process_category') }}"
-    )
-    # ------------------------------------------------------------------------------------
-    
-    # --------------------------------------- client -----------------------------------
-    load_client_from_source = SQLExecuteQueryOperator(
-        task_id='load_client_from_source',
-        conn_id='postgres_source',
-        sql='SELECT * FROM client;'
-    )
-
-    def process_client(task_instance: TaskInstance):
-        values: List[Any] = task_instance.xcom_pull(task_ids='load_client_from_source')
-        values_prepared: List[str] = []
-
-        for value in values:
-            values_prepared.append(f"""
-                (
-                    {value[0]},
-                    {value[1]},
-                    {value[2]},
-                    null,
-                    null,
-                    now()
-                )
-            """)
-
-        return ",".join(values_prepared)
-    process_client_op = PythonOperator(task_id='process_client', python_callable=process_client)
-
-    save_client_to_staging = SQLExecuteQueryOperator(
-        task_id='save_client_to_staging',
-        conn_id='postgres_dwh',
-        sql="INSERT INTO staging.pg_client(client_id, bonus_balance, category_id, when_created, when_updated, when_uploaded) VALUES {{ ti.xcom_pull(task_ids='process_client') }}"
-    )
-    # ------------------------------------------------------------------------------------
-    
-    # --------------------------------------- payment -----------------------------------
-    load_payment_from_source = SQLExecuteQueryOperator(
-        task_id='load_payment_from_source',
-        conn_id='postgres_source',
-        sql='SELECT * FROM payment;'
-    )
-
-    def process_payment(task_instance: TaskInstance):
-        values: List[Any] = task_instance.xcom_pull(task_ids='load_payment_from_source')
-        values_prepared: List[str] = []
-
-        for value in values:
-            values_prepared.append(f"""
-                (
-                    {value[0]},
-                    {value[1]},
-                    {value[2]},
-                    {value[3]},
-                    '{value[4]}',
-                    '{value[5]}',
-                    {value[6]},
-                    {value[7]},
-                    null,
-                    null,
-                    now()
-                )
-            """)
-
-        return ",".join(values_prepared)
-    process_payment_op = PythonOperator(task_id='process_payment', python_callable=process_payment)
-
-    save_payment_to_staging = SQLExecuteQueryOperator(
-        task_id='save_payment_to_staging',
-        conn_id='postgres_dwh',
-        sql="INSERT INTO staging.pg_payment(payment_id, client_id, dish_id, dish_amount, order_id, order_time, order_sum, tips, when_created, when_updated, when_uploaded) VALUES {{ ti.xcom_pull(task_ids='process_payment') }}"
+        sql="{{ ti.xcom_pull(task_ids='process_logs') }}"
     )
     # ------------------------------------------------------------------------------------
 
-    load_dish_from_source >> process_dish_op >> save_dish_to_staging
-    load_category_from_source >> process_category_op >> save_category_to_staging
-    load_client_from_source >> process_client_op >> save_client_to_staging
-    load_payment_from_source >> process_payment_op >> save_payment_to_staging
+    load_settings >> process_settings_op >> load_logs >> process_logs_op >> save_changes_to_staging
 
 
 load_postgres_source_dag()

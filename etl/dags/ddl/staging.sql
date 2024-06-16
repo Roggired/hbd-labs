@@ -97,3 +97,11 @@ CREATE TABLE IF NOT EXISTS staging.api_delivery
     when_updated       TIMESTAMP,
     when_uploaded      TIMESTAMP
 );
+
+CREATE TYPE source_id AS ENUM ('POSTGRES', 'MONGO', 'API');
+
+CREATE TABLE IF NOT EXISTS staging.settings
+(
+    "source_id" source_id PRIMARY KEY,
+    settings    JSONB NOT NULL
+);

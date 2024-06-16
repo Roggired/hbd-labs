@@ -34,13 +34,10 @@ CREATE TABLE payment
 
 CREATE TYPE log_action AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 
--- TODO: нужно добавить в табличку лога идентификатор строки, для которой лог-запись создана.
--- это позволит на стороне дага загрузки данных в airflow намутить инкрементальную загрузку +
--- позволит определить записи when_created и when_updated. Что не мало важно, мы также сможем
--- удалять записи из staging слоя, которые были удалены в бд-источнике.
 CREATE TABLE logs
 (
 	id BIGSERIAL PRIMARY KEY,
+    entity_id BIGINT NOT NULL,
 	table_name VARCHAR(255) NOT NULL,
 	"time" TIMESTAMP NOT NULL,
 	"values" JSONB,
@@ -50,21 +47,55 @@ CREATE TABLE logs
 CREATE FUNCTION log_trigger() RETURNS TRIGGER AS
 $$
 DECLARE
+    entity_id BIGINT;
 	new_values JSONB;
 	updated_values JSONB;
 	removed_values JSONB;
 BEGIN
 	IF (TG_OP = 'INSERT') THEN
 		new_values := row_to_json(NEW);
-		INSERT INTO logs(table_name, "time", "values", action) VALUES(TG_TABLE_NAME, now(), new_values, 'INSERT');
+
+		IF (TG_TABLE_NAME = 'dish') THEN
+            entity_id := NEW.dish_id;
+        ELSIF (TG_TABLE_NAME = 'category') THEN
+		    entity_id := NEW.category_id;
+		ELSIF (TG_TABLE_NAME = 'client') THEN
+		    entity_id := NEW.client_id;
+		ELSIF (TG_TABLE_NAME = 'payment') THEN
+		    entity_id := NEW.payment_id;
+        END IF;
+
+		INSERT INTO logs(entity_id, table_name, "time", "values", action) VALUES(entity_id, TG_TABLE_NAME, now(), new_values, 'INSERT');
 		RETURN NEW;
 	ELSIF (TG_OP = 'UPDATE') THEN
 		updated_values := row_to_json(NEW);
-		INSERT INTO logs(table_name, "time", "values", action) VALUES(TG_TABLE_NAME, now(), updated_values, 'UPDATE');
+
+		IF (TG_TABLE_NAME = 'dish') THEN
+            entity_id := NEW.dish_id;
+        ELSIF (TG_TABLE_NAME = 'category') THEN
+		    entity_id := NEW.category_id;
+		ELSIF (TG_TABLE_NAME = 'client') THEN
+		    entity_id := NEW.client_id;
+		ELSIF (TG_TABLE_NAME = 'payment') THEN
+		    entity_id := NEW.payment_id;
+        END IF;
+
+		INSERT INTO logs(entity_id, table_name, "time", "values", action) VALUES(entity_id, TG_TABLE_NAME, now(), updated_values, 'UPDATE');
 		RETURN NEW;
 	ELSIF (TG_OP = 'DELETE') THEN
 		removed_values := row_to_json(OLD);
-		INSERT INTO logs(table_name, "time", "values", action) VALUES(TG_TABLE_NAME, now(), removed_values, 'DELETE');
+
+		IF (TG_TABLE_NAME = 'dish') THEN
+            entity_id := OLD.dish_id;
+        ELSIF (TG_TABLE_NAME = 'category') THEN
+		    entity_id := OLD.category_id;
+		ELSIF (TG_TABLE_NAME = 'client') THEN
+		    entity_id := OLD.client_id;
+		ELSIF (TG_TABLE_NAME = 'payment') THEN
+		    entity_id := OLD.payment_id;
+        END IF;
+
+		INSERT INTO logs(entity_id, table_name, "time", "values", action) VALUES(entity_id, TG_TABLE_NAME, now(), removed_values, 'DELETE');
 		RETURN OLD;
 	END IF;
 END;
