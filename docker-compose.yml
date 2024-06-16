@@ -33,7 +33,9 @@ services:
   airflow:
 #    depends_on:
 #      - airflow-init
-    image: apache/airflow:latest
+    build:
+      context: ./etl
+      dockerfile: Dockerfile-custom-airflow
     entrypoint: "airflow standalone"
     volumes:
       - ./etl/dags:/opt/airflow/dags

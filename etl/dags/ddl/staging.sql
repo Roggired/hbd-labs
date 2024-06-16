@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS staging.mongo_orders
 (
     id            BIGSERIAL PRIMARY KEY,
     obj_id        VARCHAR(31) NOT NULL UNIQUE,
+    obj_val       JSONB       NOT NULL,
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
     when_uploaded TIMESTAMP
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS staging.mongo_restaurant
 (
     id            BIGSERIAL PRIMARY KEY,
     obj_id        VARCHAR(31) NOT NULL UNIQUE,
+    obj_val       JSONB       NOT NULL,
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
     when_uploaded TIMESTAMP
