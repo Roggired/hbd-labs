@@ -46,7 +46,7 @@ def load_postgres_source_dag():
     load_logs = SQLExecuteQueryOperator(
         task_id='load_logs',
         conn_id='postgres_source',
-        sql="SELECT * FROM logs WHERE id > {{ ti.xcom_pull(task_ids='process_settings') }};"
+        sql="SELECT * FROM logs WHERE id > {{ ti.xcom_pull(task_ids='process_settings') }} ORDER BY id ASC LIMIT 100;"
     )
 
     def process_logs(task_instance: TaskInstance):
