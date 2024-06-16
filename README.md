@@ -8,8 +8,9 @@ P4115 - Карасёва Мария
 
 1. Создаем директорию и пустой файл базы данных самого airflow:
 ```bash
-mkdir ./etc/data
-touch ./etc/data/airflow.db
+mkdir ./etl/data
+touch ./etl/data/airflow.db
+chmod 777 ./etl/data/airflow.db
 ```
 2. Запускаем контейнеры:
 ```bash
@@ -26,8 +27,8 @@ password: <найти в логах и запомнить>
 ```
 4. Admin -> Connections инициализируем коннекты к источникам данных
 ```text
-ID: postgres_source
-hostname: source
+ID: postgres_dwh
+host: postgres
 database: source
 username: source
 password: source
