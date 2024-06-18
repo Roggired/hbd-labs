@@ -31,8 +31,18 @@ def load_postgres_source_dag():
             settings = {
                 'last_loaded_log_id': 0
             }
+            Variable.set(
+                key='POSTGRES__settings_initialized',
+                value=False,
+                serialize_json=True
+            )
         else:
             settings = values[0][0]
+            Variable.set(
+                key='POSTGRES__settings_initialized',
+                value=True,
+                serialize_json=True
+            )
 
         Variable.set(
             key='POSTGRES__last_loaded_log_id',
@@ -53,6 +63,7 @@ def load_postgres_source_dag():
         values: List[Any] = task_instance.xcom_pull(task_ids='load_logs')
         operations: List[str]
         last_loaded_log_id = int(Variable.get(key='POSTGRES__last_loaded_log_id'))
+        settings_initialized: bool = Variable.get(key='POSTGRES__settings_initialized', deserialize_json=True)
 
         from processors.postgres_processor import PostgresProcessor
         import json
@@ -68,7 +79,7 @@ def load_postgres_source_dag():
         updated_settings: Dict[str, Any] = {
             'last_loaded_log_id': postgres_processor.get_last_processed_log_id()
         }
-        if last_loaded_log_id == 0:
+        if not settings_initialized:
             operations.append(
                 f"INSERT INTO staging.settings(source_id, settings) VALUES('POSTGRES', '{json.dumps(updated_settings)}')"
             )
