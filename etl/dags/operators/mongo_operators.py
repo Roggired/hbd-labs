@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from typing import Any, Callable, List
 
 from airflow.models.baseoperator import BaseOperator
@@ -26,7 +27,7 @@ class MongoFetchManyOperator(BaseOperator):
 
         for entry in entries:
             entry['_id'] = str(entry['_id'])
-            entry['update_time'] = str(datetime.datetime.fromtimestamp(int(entry['update_time']['$date']['$numberLong']) / 1000))
+            entry['update_time'] = str(datetime.datetime.fromtimestamp(int(entry['update_time']['$date']['$numberLong']) / 1000, tz=pytz.utc))
 
         if self._mongo_collection == 'Restaurant':
             for entry in entries:
@@ -37,7 +38,7 @@ class MongoFetchManyOperator(BaseOperator):
             for entry in entries:
                 entry['restaurant']['id'] = str(entry['restaurant']['id'])
                 entry['client']['id'] = str(entry['client']['id'])
-                entry['order_date'] = str(datetime.datetime.fromtimestamp(int(entry['order_date']['$date']['$numberLong']) / 1000))
+                entry['order_date'] = str(datetime.datetime.fromtimestamp(int(entry['order_date']['$date']['$numberLong']) / 1000, tz=pytz.utc))
                 for ordered_dish in entry['ordered_dish']:
                     ordered_dish['id'] = str(ordered_dish['id'])
 

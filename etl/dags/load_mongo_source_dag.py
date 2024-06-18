@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from typing import Any, List, Dict
 
 from airflow.decorators import dag
@@ -13,7 +14,7 @@ from processors.mongo_processor import MongoCollections
 
 @dag(
     dag_id="load_mongo_source",
-    schedule_interval='*/1 * * * *',
+    schedule_interval='*/3 * * * *',
     start_date=datetime.datetime(2024, 6, 16),
     catchup=False,
     tags=['load'],
@@ -32,9 +33,9 @@ def load_mongo_source_dag():
         settings: Dict[str, Any]
         if len(values) <= 0:
             settings = {
-                'last_loaded_timestamp_restaurants': datetime.datetime(1900, 1, 1),
-                'last_loaded_timestamp_orders': datetime.datetime(1900, 1, 1),
-                'last_loaded_timestamp_clients': datetime.datetime(1900, 1, 1)
+                'last_loaded_timestamp_restaurants': datetime.datetime(1900, 1, 1, tzinfo=pytz.utc),
+                'last_loaded_timestamp_orders': datetime.datetime(1900, 1, 1, tzinfo=pytz.utc),
+                'last_loaded_timestamp_clients': datetime.datetime(1900, 1, 1, tzinfo=pytz.utc)
             }
             Variable.set(
                 key='MONGO__settings_initialized',
@@ -61,12 +62,12 @@ def load_mongo_source_dag():
         )
         Variable.set(
             key='MONGO__last_loaded_timestamp_orders',
-            value=settings['last_loaded_timestamp_restaurants'].isoformat(),
+            value=settings['last_loaded_timestamp_orders'].isoformat(),
             serialize_json=True
         )
         Variable.set(
             key='MONGO__last_loaded_timestamp_clients',
-            value=settings['last_loaded_timestamp_restaurants'].isoformat(),
+            value=settings['last_loaded_timestamp_clients'].isoformat(),
             serialize_json=True
         )
         return settings
@@ -79,7 +80,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_restaurants', deserialize_json=True)).timestamp()
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_restaurants', deserialize_json=True)).timestamp() * 1000)}'
                     }
                 },
             }
@@ -125,7 +126,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_orders', deserialize_json=True)).timestamp()
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_orders', deserialize_json=True)).timestamp() * 1000)}'
                     }
                 }
             }
@@ -171,7 +172,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_clients', deserialize_json=True)).timestamp()
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_clients', deserialize_json=True)).timestamp() * 1000)}'
                     }
                 }
             }

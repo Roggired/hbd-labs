@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import enum
 import json
 
@@ -11,7 +12,7 @@ class MongoCollections(enum.Enum):
 
 class MongoProcessor:
     def __init__(self):
-        self._update_time = datetime.datetime(1900, 1, 1)
+        self._update_time = datetime.datetime(1900, 1, 1, tzinfo=pytz.utc)
 
     def process_collection_entry_into_operation(
         self,
@@ -25,17 +26,17 @@ class MongoProcessor:
         if collection == MongoCollections.Restaurants:
             return f"""
                 INSERT INTO staging.mongo_restaurant(obj_id, obj_val, when_created, when_updated, when_uploaded)
-                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now())}')
+                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now(tz=pytz.utc))}')
             """
         elif collection == MongoCollections.Orders:
             return f"""
                 INSERT INTO staging.mongo_orders(obj_id, obj_val, when_created, when_updated, when_uploaded)
-                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now())}')
+                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now(tz=pytz.utc))}')
             """
         elif collection == MongoCollections.Clients:
             return f"""
                 INSERT INTO staging.mongo_clients(obj_id, obj_val, when_created, when_updated, when_uploaded)
-                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now())}')
+                VALUES ('{entry['_id']}', '{json.dumps(entry)}', '{entry['update_time']}', '{entry['update_time']}', '{str(datetime.datetime.now(tz=pytz.utc))}')
             """
         else:
             raise RuntimeError(f'Invalid collection: {collection}')
