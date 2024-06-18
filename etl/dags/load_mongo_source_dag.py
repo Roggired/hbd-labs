@@ -14,7 +14,7 @@ from processors.mongo_processor import MongoCollections
 
 @dag(
     dag_id="load_mongo_source",
-    schedule_interval='*/3 * * * *',
+    schedule_interval='*/5 * * * *',
     start_date=datetime.datetime(2024, 6, 16),
     catchup=False,
     tags=['load'],
@@ -80,7 +80,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_restaurants', deserialize_json=True)).timestamp() * 1000)}'
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get("MONGO__last_loaded_timestamp_restaurants", deserialize_json=True)).timestamp() * 1000)}'
                     }
                 },
             }
@@ -126,7 +126,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_orders', deserialize_json=True)).timestamp() * 1000)}'
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get("MONGO__last_loaded_timestamp_orders", deserialize_json=True)).timestamp() * 1000)}'
                     }
                 }
             }
@@ -172,7 +172,7 @@ def load_mongo_source_dag():
             "update_time": {
                 "$gt": {
                     "$date": {
-                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get('MONGO__last_loaded_timestamp_clients', deserialize_json=True)).timestamp() * 1000)}'
+                        "$numberLong": f'{int(datetime.datetime.fromisoformat(Variable.get("MONGO__last_loaded_timestamp_clients", deserialize_json=True)).timestamp() * 1000)}'
                     }
                 }
             }

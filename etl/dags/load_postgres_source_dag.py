@@ -10,7 +10,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 @dag(
     dag_id="load_postgres_source",
-    schedule_interval='*/1 * * * *',
+    schedule_interval='*/5 * * * *',
     start_date=datetime.datetime(2024, 6, 16),
     catchup=False,
     tags=['load'],
