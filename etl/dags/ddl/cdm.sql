@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS cdm AUTHORIZATION CURRENT_USER;
 CREATE TABLE IF NOT EXISTS cdm.deliveryman_income
 (
     id                       BIGSERIAL PRIMARY KEY,
-    deliveryman_id           BIGINT           NOT NULL,
+    deliveryman_id           VARCHAR(31)      NOT NULL,
     deliveryman_name         VARCHAR(255)     NOT NULL,
     year                     INT              NOT NULL,
     month                    INT              NOT NULL,
