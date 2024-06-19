@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: service
+
+  datasource:
+    url: jdbc:postgresql://database/postgres
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+
+  liquibase:
+    changeLog: classpath:db/changelog/db.changelog-master.xml
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      write-date-timestamps-as-nanoseconds: false
+      indent-output: true
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+
+  jpa:
+    properties:
+      hibernate:
+        ddlAuto: validate
+        globally_quoted_identifiers: true
+        globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: true
