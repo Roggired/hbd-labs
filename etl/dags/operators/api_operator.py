@@ -176,6 +176,16 @@ _TEST_DELIVERIES = [
         "delivery_time": "2024-12-04 13:11:23.621000+00:00",
         "rating": 5,
         "tips": 500
+    },
+    {
+        "order_id": "772738ba5b1241c78abc7e17",
+        "order_date_created": "2024-12-04 12:50:27.43000",
+        "delivery_id": "3222053d10v01cqw379td2t8",
+        "deliveryman_id": "00ga56cqwcxm789920ft8siqr",
+        "delivery_address": "Ул. Мира, 7, корпус 1, кв. 4",
+        "delivery_time": "2024-12-04 13:11:23.621000+00:00",
+        "rating": 5,
+        "tips": 500
     }
 ]
 

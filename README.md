@@ -27,18 +27,20 @@ password: <найти в логах и запомнить>
 ```
 4. Admin -> Connections инициализируем коннекты к источникам данных
 ```text
-ID: postgres_source
-host: postgres
-database: source
-username: source
-password: source
-
 ID: postgres_dwh
 host: postgres
 database: dwh
 username: dwh
 password: dwh
-
+```
+```text
+ID: postgres_source
+host: postgres
+database: source
+username: source
+password: source
+```
+```text
 ID: mongo_source
 host: mongodb
 database: mongo
