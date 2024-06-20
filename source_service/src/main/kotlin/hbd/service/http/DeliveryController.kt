@@ -1,7 +1,7 @@
 package hbd.service.http
 
 import hbd.service.domain.entity.DeliveryManEntity
-import hbd.service.domain.entity.OrderEntity
+import hbd.service.domain.entity.DeliveryEntity
 import hbd.service.domain.service.DeliveryService
 import org.springframework.data.domain.Page
 import org.springframework.validation.annotation.Validated
@@ -18,21 +18,23 @@ class DeliveryController(
         @RequestParam pageSize: Int,
         @RequestParam pageNumber: Int,
         @RequestBody @Validated orderRequest: OrderRequest
-    ): PageView<OrderEntity> = deliveryService.getAllOrders(
+    ): PageView<DeliveryEntity> = deliveryService.getAllOrders(
         pageSize = pageSize,
         pageNumber = pageNumber,
         orderRequest = orderRequest,
     ).toView()
 
 
-    @GetMapping("/delivers")
+    @PostMapping("/delivers")
     fun getAllDeliveryMen(
         @RequestParam pageSize: Int,
-        @RequestParam pageNumber: Int
+        @RequestParam pageNumber: Int,
+        @RequestBody @Validated request: DeliverymanRequest,
     ): PageView<DeliveryManEntity> = deliveryService.getAllDeliveryMen(
         pageSize = pageSize,
         pageNumber = pageNumber,
-    ).toView()
+        request = request,
+    )
 }
 
 data class PageView<T>(
@@ -49,4 +51,8 @@ fun <T> Page<T>.toView(): PageView<T> = PageView(
 
 data class OrderRequest(
     val deliveryTimeFilterClause: String,
+)
+
+data class DeliverymanRequest(
+    val numberOfDeliverymansToSkip: Int,
 )

@@ -1,5 +1,5 @@
 create table delivery_man
 (
-    id   uuid primary key,
+    id   VARCHAR(63) primary key,
     name varchar(255) not null
 );

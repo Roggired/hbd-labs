@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS staging.pg_payment
 CREATE TABLE IF NOT EXISTS staging.mongo_clients
 (
     id            BIGSERIAL PRIMARY KEY,
-    obj_id        VARCHAR(31) NOT NULL UNIQUE,
+    obj_id        VARCHAR(63) NOT NULL UNIQUE,
     obj_val       JSONB       NOT NULL,
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS staging.mongo_clients
 CREATE TABLE IF NOT EXISTS staging.mongo_orders
 (
     id            BIGSERIAL PRIMARY KEY,
-    obj_id        VARCHAR(31) NOT NULL UNIQUE,
+    obj_id        VARCHAR(63) NOT NULL UNIQUE,
     obj_val       JSONB       NOT NULL,
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS staging.mongo_orders
 CREATE TABLE IF NOT EXISTS staging.mongo_restaurant
 (
     id            BIGSERIAL PRIMARY KEY,
-    obj_id        VARCHAR(31) NOT NULL UNIQUE,
+    obj_id        VARCHAR(63) NOT NULL UNIQUE,
     obj_val       JSONB       NOT NULL,
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS staging.mongo_restaurant
 
 CREATE TABLE IF NOT EXISTS staging.api_deliveryman
 (
-    id            VARCHAR(31) PRIMARY KEY,
+    id            VARCHAR(63) PRIMARY KEY,
     name          VARCHAR(255),
     when_created  TIMESTAMP,
     when_updated  TIMESTAMP,
@@ -87,11 +87,11 @@ CREATE TABLE IF NOT EXISTS staging.api_deliveryman
 
 CREATE TABLE IF NOT EXISTS staging.api_delivery
 (
-    delivery_id        VARCHAR(31) PRIMARY KEY,
-    deliveryman_id     VARCHAR(31),
+    delivery_id        VARCHAR(63) PRIMARY KEY,
+    deliveryman_id     VARCHAR(63),
     delivery_address   VARCHAR(255),
     delivery_time      TIMESTAMP,
-    order_id           VARCHAR(31),
+    order_id           VARCHAR(63),
     order_date_created TIMESTAMP,
     rating             SMALLINT,
     tips               DOUBLE PRECISION,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS staging.api_delivery
     when_uploaded      TIMESTAMP
 );
 
-CREATE TYPE source_id AS ENUM ('POSTGRES', 'MONGO', 'API');
+-- CREATE TYPE source_id AS ENUM ('POSTGRES', 'MONGO', 'API');
 
 CREATE TABLE IF NOT EXISTS staging.settings
 (

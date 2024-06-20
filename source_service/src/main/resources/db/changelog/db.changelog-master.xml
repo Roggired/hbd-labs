@@ -4,5 +4,5 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     <include file="/db/changelog/2024/06/2024.06.11-add-delivery-man.sql"/>
-    <include file="/db/changelog/2024/06/2024.06.11-add-order.sql"/>
+    <include file="/db/changelog/2024/06/2024.06.11-add-deliveries.sql"/>
 </databaseChangeLog>

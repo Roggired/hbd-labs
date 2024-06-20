@@ -47,3 +47,20 @@ database: mongo
 username: mongo
 password: mongo
 ```
+5. Admin -> Variables инициализируем коннекты к api
+```text
+ID: api_delivery
+{
+"url": "http://api:8080/api/v1/delivery/orders",
+"method": "POST",
+"entity_type": "DELIVERY"
+}
+```
+```text
+ID: api_deliveryman
+{
+"url": "http://api:8080/api/v1/delivery/delivers",
+"method": "GET",
+"entity_type": "DELIVERYMAN"
+}
+```

@@ -12,7 +12,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 @dag(
     dag_id="load_dds_source_dag",
-    schedule_interval='*/5 * * * *',
+    schedule_interval='@once',
     start_date=datetime.datetime(2024, 6, 19),
     catchup=False,
     tags=['load'],

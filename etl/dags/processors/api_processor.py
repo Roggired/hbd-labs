@@ -10,7 +10,7 @@ class APIProcessor:
         self,
         entity: dict,
     ) -> str:
-        delivery_time = datetime.datetime.fromisoformat(entity['delivery_time'])
+        delivery_time = pytz.utc.localize(datetime.datetime.fromisoformat(entity['delivery_time']))
         if delivery_time > self._delivery_time:
             self._delivery_time = delivery_time
         return f"""

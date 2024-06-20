@@ -150,11 +150,11 @@ def process_data_from_dds(
                 order.payment_id,
                 Payment(payment_id=0, payment_year=0, payment_month=0, payment_sum=0)
             ).payment_sum
-            if order.deliveryman_id in deliveries_map:
-                rating_total += deliveries_map[order.deliveryman_id].rating
+            if order.delivery_id in deliveries_map:
+                rating_total += deliveries_map[order.delivery_id].rating
                 rating_amount += 1
             tips += deliveries_map.get(
-                order.deliveryman_id,
+                order.delivery_id,
                 Delivery(id='', rating=0, tips=0)
             ).tips
 

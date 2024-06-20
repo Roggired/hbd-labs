@@ -13,7 +13,7 @@ from operators.api_operator import APIFetchOperator
 
 @dag(
     dag_id="load_api_source_dag",
-    schedule_interval='*/5 * * * *',
+    schedule_interval='@once',
     start_date=datetime.datetime(2024, 6, 16),
     catchup=False,
     tags=['load'],
@@ -79,15 +79,15 @@ def load_api_source_dag():
     # --------------------------------------- loads deliveries ---------------------------
     def load_deliveries_body_provider():
         return {
-            'delivery_time_filter_clause': Variable.get(key='API__last_loaded_timestamp_deliveries', deserialize_json=True),
+            'deliveryTimeFilterClause': Variable.get(key='API__last_loaded_timestamp_deliveries', deserialize_json=True).replace("+00:00", ""),
         }
 
     load_deliveries = APIFetchOperator(
         task_id='load_deliveries',
         conn_variable_id='api_delivery',
         query_params={
-            'page_number': 0,
-            'page_size': 100,
+            'pageNumber': 0,
+            'pageSize': 100,
         },
         body_provider=load_deliveries_body_provider,
     )
@@ -95,10 +95,20 @@ def load_api_source_dag():
     def process_deliveries(task_instance: TaskInstance):
         page: dict = task_instance.xcom_pull(task_ids='load_deliveries')
         if page.get('content', None) is None:
+            Variable.set(
+                key='API__new_last_loaded_timestamp_deliveries',
+                value=Variable.get(key='API__last_loaded_timestamp_deliveries', deserialize_json=True),
+                serialize_json=True,
+            )
             return ""
 
         content: List[dict] = page['content']
         if len(content) == 0:
+            Variable.set(
+                key='API__new_last_loaded_timestamp_deliveries',
+                value=Variable.get(key='API__last_loaded_timestamp_deliveries', deserialize_json=True),
+                serialize_json=True,
+            )
             return ""
 
         from processors.api_processor import APIProcessor
@@ -124,15 +134,15 @@ def load_api_source_dag():
     # --------------------------------------- loads deliverymans -------------------------
     def load_deliverymans_body_provider():
         return {
-            'number_of_deliverymans_to_skip': Variable.get(key='API__number_of_deliverymans', deserialize_json=True)[0][0],
+            'numberOfDeliverymansToSkip': Variable.get(key='API__number_of_deliverymans', deserialize_json=True)[0][0],
         }
 
     load_deliverymans = APIFetchOperator(
         task_id='load_deliverymans',
         conn_variable_id='api_deliveryman',
         query_params={
-            'page_number': 0,
-            'page_size': 100,
+            'pageNumber': 0,
+            'pageSize': 100,
         },
         body_provider=load_deliverymans_body_provider,
     )

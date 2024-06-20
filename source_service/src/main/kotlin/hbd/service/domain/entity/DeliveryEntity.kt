@@ -1,19 +1,20 @@
 package hbd.service.domain.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
-@Table(name = "orders")
-class OrderEntity(
+@Table(name = "deliveries")
+class DeliveryEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
+    val deliveryId: String,
     @Column(name = "order_date_created")
     val orderDateCreated: LocalDateTime,
-    @Column(name = "delivery_id")
-    val deliveryId: String,
+    @Column(name = "order_id")
+    val orderId: String,
     @Column(name = "deliveryman_id")
     val deliveryManId: String,
     @Column(name = "delivery_address")

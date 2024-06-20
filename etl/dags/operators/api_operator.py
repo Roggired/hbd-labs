@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional, Callable, List
 
+import pytz
 from airflow.models.baseoperator import BaseOperator
 from airflow.utils.context import Context
 import datetime
@@ -30,7 +31,7 @@ class APIFetchOperator(BaseOperator):
         self._body_provider = body_provider
 
     def execute(self, context: Context) -> Any:
-        return StubRestHook(self._conn_variable_id).execute(
+        return RealRestHook(self._conn_variable_id).execute(
             query_params=self._query_params,
             body=self._body_provider(),
         )
@@ -72,7 +73,64 @@ class RealRestHook(AbstractRestHook):
         query_params: Optional[Dict[str, Any]] = None,
         body: Optional[Dict[str, Any]] = None
     ) -> dict:
-        raise NotImplementedError()
+        import requests
+        from requests import Response
+        if self._entity_type == APIEntityType.DELIVERY.name:
+            response: Response = requests.post(
+                url=self._url,
+                json=body,
+                params=query_params,
+            )
+
+            if response.status_code != 200:
+                if response.status_code == 400:
+                    print(response.json())
+                raise RuntimeError(f"API answered: {response.status_code}")
+
+            page: dict = response.json()
+            return {
+                'total_elements': page['totalElements'],
+                'total_pages': page['totalPages'],
+                'content': list(
+                    map(
+                        lambda entity: self._map_order_response(entity),
+                        page['content'],
+                    )
+                )
+            }
+
+        if self._entity_type == APIEntityType.DELIVERYMAN.name:
+            response: Response = requests.post(
+                url=self._url,
+                json=body,
+                params=query_params,
+            )
+
+            if response.status_code != 200:
+                if response.status_code == 400:
+                    print(response.json())
+                raise RuntimeError(f"API answered: {response.status_code}")
+
+            page: dict = response.json()
+            return {
+                'total_elements': page['totalElements'],
+                'total_pages': page['totalPages'],
+                'content': page['content']
+            }
+
+        raise RuntimeError("Invalid entity_type supplied")
+
+    def _map_order_response(self, entity: dict) -> dict:
+        return {
+            'order_id': entity['orderId'],
+            'order_date_created': entity['orderDateCreated'],
+            'delivery_id': entity['deliveryId'],
+            'deliveryman_id': entity['deliveryManId'],
+            'delivery_address': entity['deliveryAddress'],
+            'delivery_time': entity['deliveryTime'],
+            'rating': entity['rating'],
+            'tips': entity['tips'],
+        }
 
 
 class StubRestHook(AbstractRestHook):
