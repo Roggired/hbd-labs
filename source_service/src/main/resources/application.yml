@@ -3,10 +3,10 @@ spring:
     name: service
 
   datasource:
-    url: jdbc:postgresql://database/postgres
+    url: jdbc:postgresql://postgres/api
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: api
+    password: api
 
   liquibase:
     changeLog: classpath:db/changelog/db.changelog-master.xml

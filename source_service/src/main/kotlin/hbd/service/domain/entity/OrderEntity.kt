@@ -1,15 +1,11 @@
 package hbd.service.domain.entity
 
-import hbd.service.domain.model.Order
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
 
-@Entity(name = "orders")
+@Entity
+@Table(name = "orders")
 class OrderEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,15 +22,4 @@ class OrderEntity(
     val deliveryTime: LocalDateTime,
     val rating: Double,
     val tips: Double?
-)
-
-fun OrderEntity.toModel(): Order = Order(
-    orderId = id,
-    orderDateCreated = orderDateCreated,
-    deliveryId = deliveryId,
-    deliveryManId = deliveryManId,
-    deliveryAddress = deliveryAddress,
-    deliveryTime = deliveryTime,
-    rating = rating,
-    tips = tips
 )

@@ -1,3 +1,6 @@
 .idea
 build
 node_modules
+source_service/build
+source_service/.gradle
+source_service/.idea
